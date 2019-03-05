@@ -3,8 +3,8 @@
 - name: copy gpu_stat.py
   copy: src=gpu_stat.py dest="{{ sacctgpu_bin }}/gpu_stat.py" owner=root group=root mode="0744"
 
-- name: copy jobinfo.pl
-  copy: src=jobinfo.pl dest="{{ sacctgpu_bin }}/jobinfo.pl" owner=root group=root mode="0755"
+- name: copy jobinfo.py
+  copy: src=jobinfo.py dest="{{ sacctgpu_bin }}/jobinfo.py" owner=root group=root mode="0755"
 
 - name: Ensure gpu_stats collects data every minute
   cron:
