@@ -4,6 +4,8 @@
 import json
 import re
 import subprocess
+import tempfile
+import os
 
 # find slurm-job-ids active on this node
 def jobs_running():
@@ -79,8 +81,9 @@ def read_shm():
 
 
 def write_shm(jobinfo):
-   with open('/run/gpustats.json', 'w') as fp:
+   with tempfile.NamedTemporaryFile(mode='w', delete=False, dir='/run') as fp:
       json.dump(jobinfo, fp)
+   os.rename(fp.name, '/run/gpustats.json')
 
 def main():
 
