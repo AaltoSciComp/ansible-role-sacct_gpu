@@ -80,7 +80,8 @@ def read_shm(fil):
 
 
 def write_shm(jobinfo, fname):
-   with tempfile.NamedTemporaryFile(mode='w', delete=False, dir='/run') as fp:
+   with tempfile.NamedTemporaryFile(mode='w', delete=False, \
+                     dir=os.path.dirname(os.path.normpath(fname))) as fp:
       json.dump(jobinfo, fp)
    os.rename(fp.name, fname)
 
