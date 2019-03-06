@@ -55,14 +55,15 @@ def gpu_info(jobinfo):
 
    for gpu in root.findall('gpu'):
       procs = gpu.find('processes')
-      # TODO: No support for multiple procs / GPU. Shouldn't be a
-      # problem as long as we use exclusive mode, but...
+      mtot = 0.
+      # Here we assume that multiple job id's cannot access the same
+      # GPU
       for pi in procs.findall('process_info'):
          pid = pi.find('pid').text
          jobid = pid2id(pid)
          # Assume used_memory is of the form '1750 MiB'. Needs fixing
          # if the unit is anything but MiB.
-         mutil = float(pi.find('used_memory').text.split()[0])
+         mtot += float(pi.find('used_memory').text.split()[0])
       util = gpu.find('utilization')
       # Here assume gpu utilization is of the form
       # '100 %'
@@ -70,8 +71,8 @@ def gpu_info(jobinfo):
 
       # only update, if jobid not dropped (multinode jobs)
       if jobid in jobinfo.keys():
-         jobinfo[jobid]['util']+=gutil/jobinfo[jobid]['ngpu']
-         jobinfo[jobid]['mem'] = max(mutil, jobinfo[jobid]['mem'])
+         jobinfo[jobid]['gpu_util'] += gutil/jobinfo[jobid]['ngpu']
+         jobinfo[jobid]['gpu_mem_max'] = max(mtot, jobinfo[jobid]['gpu_mem_max'])
 
    return jobinfo
 
@@ -99,7 +100,7 @@ def main():
    jobs    = jobs_running()
 
    for job in jobs:
-      current[job]={'util': 0, 'mem': 0, 'ngpu': 0, 'ncpu': 0, 'step': 1}
+      current[job]={'gpu_util': 0, 'gpu_mem_max': 0, 'ngpu': 0, 'ncpu': 0, 'step': 1}
 
    # get current job info
    current = job_info(jobs, current)
@@ -115,8 +116,8 @@ def main():
    for job in jobs:
       if job in prev.keys():
          n = prev[job]['step']
-         current[job]['util'] = ( float(prev[job]['util'])*n+float(current[job]['util']) )/(n+1)
-         current[job]['mem']  = max(float(prev[job]['mem']), float(current[job]['mem']))
+         current[job]['gpu_util'] = ( float(prev[job]['gpu_util'])*n+float(current[job]['gpu_util']) )/(n+1)
+         current[job]['gpu_mem_max']  = max(float(prev[job]['gpu_mem_max']), float(current[job]['gpu_mem_max']))
          current[job]['step'] = n+1
 
    # write json
