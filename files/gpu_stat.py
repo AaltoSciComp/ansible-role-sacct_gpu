@@ -71,7 +71,7 @@ def gpu_info(jobinfo):
       # only update, if jobid not dropped (multinode jobs)
       if jobid in jobinfo.keys():
          jobinfo[jobid]['util']+=gutil/jobinfo[jobid]['ngpu']
-         jobinfo[jobid]['mem']+=mutil/jobinfo[jobid]['ngpu']
+         jobinfo[jobid]['mem'] = max(mutil, jobinfo[jobid]['mem'])
 
    return jobinfo
 
@@ -116,7 +116,7 @@ def main():
       if job in prev.keys():
          n = prev[job]['step']
          current[job]['util'] = ( float(prev[job]['util'])*n+float(current[job]['util']) )/(n+1)
-         current[job]['mem']  = ( float(prev[job]['mem'])*n+float(current[job]['mem']) )/(n+1)
+         current[job]['mem']  = max(float(prev[job]['mem']), float(current[job]['mem']))
          current[job]['step'] = n+1
 
    # write json
