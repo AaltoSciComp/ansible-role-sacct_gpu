@@ -20,14 +20,17 @@ def jobs_running():
 
    return jobs
 
-# convert pid to slurm jobid
+
 def pid2id(pid):
-   output = subprocess.check_output("cat /proc/%s/cgroup |grep cpuset" % pid, shell=True)
-   m = re.search('.*job_(\d+)\/.*', output)
-   if m:
-      return m.group(1)
-   else:
-      return '0'
+   """convert pid to slurm jobid"""
+   with open('/proc/%s/cgroup' % pid) as f:
+      for line in f:
+         m = re.search('.*slurm/uid_.*job_(\d+)\/.*', line)
+         if m:
+            return m.group(1)
+         else:
+            return '0'
+
 
 # get needed slurm values for each running job on the node
 def job_info(jobs,current):
