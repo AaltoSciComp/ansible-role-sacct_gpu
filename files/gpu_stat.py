@@ -68,9 +68,8 @@ def gpu_info(jobinfo):
 
    return jobinfo
 
-def read_shm():
+def read_shm(fil):
    import os.path
-   fil = '/run/gpustats.json'
    jobinfo = {}
 
    if(os.path.exists(fil)):
@@ -80,10 +79,10 @@ def read_shm():
    return jobinfo
 
 
-def write_shm(jobinfo):
+def write_shm(jobinfo, fname):
    with tempfile.NamedTemporaryFile(mode='w', delete=False, dir='/run') as fp:
       json.dump(jobinfo, fp)
-   os.rename(fp.name, '/run/gpustats.json')
+   os.rename(fp.name, fname)
 
 def main():
 
@@ -98,8 +97,9 @@ def main():
    current = job_info(jobs, current)
    current = gpu_info(current)
 
+   fname = '/run/gpustats.json'
    # combine with previous steps
-   prev = read_shm()
+   prev = read_shm(fname)
    for job in jobs:
       if job in prev.keys():
          n = prev[job]['step']
@@ -108,7 +108,7 @@ def main():
          current[job]['step'] = n+1
 
    # write json
-   write_shm(current)
+   write_shm(current, fname)
 
 
 if __name__ == '__main__':
