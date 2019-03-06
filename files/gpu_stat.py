@@ -25,11 +25,10 @@ def pid2id(pid):
    """convert pid to slurm jobid"""
    with open('/proc/%s/cgroup' % pid) as f:
       for line in f:
-         m = re.search('.*slurm/uid_.*job_(\d+)\/.*', line)
+         m = re.search('.*slurm\/uid_.*\/job_(\d+)\/.*', line)
          if m:
             return m.group(1)
-         else:
-            return '0'
+   return None
 
 
 # get needed slurm values for each running job on the node
@@ -59,6 +58,7 @@ def gpu_info(jobinfo):
    for gpu in root.findall('gpu'):
       procs = gpu.find('processes')
       mtot = 0.
+      jobid = None
       # Here we assume that multiple job id's cannot access the same
       # GPU
       for pi in procs.findall('process_info'):
