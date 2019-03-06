@@ -86,7 +86,7 @@ def write_shm(jobinfo, fname):
    os.rename(fp.name, fname)
 
 def main():
-
+   import sys
    # initialize stats
    current = {}
    jobs    = jobs_running()
@@ -98,7 +98,11 @@ def main():
    current = job_info(jobs, current)
    current = gpu_info(current)
 
-   fname = '/run/gpustats.json'
+   if len(sys.argv) > 1:
+      fname = sys.argv[1]
+   else:
+      fname = '/run/gpustats.json'
+
    # combine with previous steps
    prev = read_shm(fname)
    for job in jobs:
