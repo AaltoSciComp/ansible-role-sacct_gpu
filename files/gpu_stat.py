@@ -48,23 +48,30 @@ def job_info(jobs,current):
 
 
 def gpu_info(jobinfo):
-   # get gpu/mem/pid stats in a single line per gpu-core (a bit ugly to get one-liner output)
-   output = subprocess.check_output("nvidia-smi -q -d pids,utilization | \
-   egrep '(Gpu|^\s+Memory\s+:|Process ID|^GPU)' | \
-   grep -B2 ID|grep -v '\-\-' | \
-   sed 'N;N;s/\\n//g'|sed s/'\s\s*'/' '/g",  shell=True)
+   import xml.etree.cElementTree as ET
 
-   for row in output.split('\n'):
-      if(len(row) > 2):
-         vals=row.split(' ')
-         jobid=pid2id(vals[12])
-         gutil = float(vals[3])
-         mutil = float(vals[7])
+   output = subprocess.check_output(['nvidia-smi', '-q', '-x'])
+   root = ET.fromstring(output)
 
-         # only update, if jobid not dropped (multinode jobs)
-         if jobid in jobinfo.keys():
-            jobinfo[jobid]['util']+=gutil/jobinfo[jobid]['ngpu']
-            jobinfo[jobid]['mem']+=mutil/jobinfo[jobid]['ngpu']
+   for gpu in root.findall('gpu'):
+      procs = gpu.find('processes')
+      # TODO: No support for multiple procs / GPU. Shouldn't be a
+      # problem as long as we use exclusive mode, but...
+      for pi in procs.findall('process_info'):
+         pid = pi.find('pid').text
+         jobid = pid2id(pid)
+         # Assume used_memory is of the form '1750 MiB'. Needs fixing
+         # if the unit is every anything but MiB.
+         mutil = float(pi.find('used_memory').text.split()[0])
+      util = gpu.find('utilization')
+      # Here assume gpu utilization is of the form
+      # '100 %'
+      gutil = float(util.find('gpu_util').text.split()[0])
+
+      # only update, if jobid not dropped (multinode jobs)
+      if jobid in jobinfo.keys():
+         jobinfo[jobid]['util']+=gutil/jobinfo[jobid]['ngpu']
+         jobinfo[jobid]['mem']+=mutil/jobinfo[jobid]['ngpu']
 
    return jobinfo
 
