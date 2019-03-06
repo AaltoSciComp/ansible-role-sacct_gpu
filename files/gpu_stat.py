@@ -61,7 +61,7 @@ def gpu_info(jobinfo):
          pid = pi.find('pid').text
          jobid = pid2id(pid)
          # Assume used_memory is of the form '1750 MiB'. Needs fixing
-         # if the unit is every anything but MiB.
+         # if the unit is anything but MiB.
          mutil = float(pi.find('used_memory').text.split()[0])
       util = gpu.find('utilization')
       # Here assume gpu utilization is of the form
