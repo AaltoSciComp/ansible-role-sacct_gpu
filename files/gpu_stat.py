@@ -27,7 +27,7 @@ def pid2id(pid):
 # get needed slurm values for each running job on the node
 def job_info(jobs,current):
    for job in jobs:
-      output = subprocess.check_output("scontrol -o show job %s" % job, shell=True)
+      output = subprocess.check_output(['scontrol', '-o', 'show', 'job', job])
       cpus   = re.search('NumCPUs=(\d+)', output)
       gres   = re.search('Gres=(\S+)', output).group(1)
       nodes  = re.search('NumNodes=(\d+)', output)
