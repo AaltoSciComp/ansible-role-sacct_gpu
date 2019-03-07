@@ -6,9 +6,13 @@ Add gpu utilization stats to Slurm batch scheduler accounting db. Tested with Ce
 This is intended to be used with [Slurm](https://slurm.schedmd.com/) to provide insight on job-gpu utilization. This adds short json-formatted string to 
 sacct-database comment field containing stats for:
 
-- number of used gpu's
-- over job averate gpu utilization reported by nvidia-smi
-- over job averate gpu memory utilization reported by nvidia-smi
+- Number of used gpu's
+- Job average gpu utilization reported by nvidia-smi. For a multi-GPU
+  job this is the sum of the utilization of all GPU's divided by the
+  number of GPU's. So 100 % would mean all GPU's are fully used.
+- Job max gpu memory utilization reported by nvidia-smi. For a
+  multi-GPU job this is the maximum memory used by any single GPU, not
+  the sum.
 
 ## How it works
 
