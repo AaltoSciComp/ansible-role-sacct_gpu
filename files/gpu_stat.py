@@ -28,15 +28,24 @@ def pid2id(pid):
 def job_info(jobs,current):
    for job in jobs:
       output = subprocess.check_output("scontrol -o show job %s" % job, shell=True)
-      cpus   = re.search('.*NumCPUs=(\d+)\s',output)
-      gres   = re.search('.*Gres=.*:(\d+)\s',output)
-      nodes  = re.search('.*NumNodes=(\d+)\s',output)
+      cpus   = re.search('NumCPUs=(\d+)', output)
+      gres   = re.search('Gres=(\S+)', output).group(1)
+      nodes  = re.search('NumNodes=(\d+)', output)
+
+      ngpu = 0
+      for g in gres.split(','):
+         gs = g.split(':')
+         if gs[0] == 'gpu':
+            if len(gs) == 1:
+               ngpu = 1
+            else:
+               ngpu = int(gs[-1])
 
       # drop multi-node jobs (will be added later if needed)
       if int(nodes.group(1)) > 1:
          del current[job]
       else:
-         current[job]['ngpu']=int(gres.group(1))
+         current[job]['ngpu'] = ngpu
          current[job]['ncpu']=int(cpus.group(1))
 
    return current
