@@ -7,18 +7,11 @@ import subprocess
 import tempfile
 import os
 
-# find slurm-job-ids active on this node
+
 def jobs_running():
-   task = subprocess.Popen('ps -ef|grep "/var/spool/slurmd/"|grep job|sed s/.*job//|cut -d"/" -f1', shell=True, stdout=subprocess.PIPE)
-   data = task.stdout.read()
-   assert task.wait() == 0
-   jobs = []
-
-   for row in data.split('\n'):
-      if len(row) > 1:
-          jobs.append(row)
-
-   return jobs
+   """find slurm-job-ids active on this node"""
+   data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
+   return data.split()
 
 
 def pid2id(pid):
