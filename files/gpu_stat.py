@@ -87,6 +87,7 @@ def write_shm(jobinfo, fname):
    with tempfile.NamedTemporaryFile(mode='w', delete=False, \
                      dir=os.path.dirname(os.path.normpath(fname))) as fp:
       json.dump(jobinfo, fp)
+   os.chmod(fp.name, 0o0644)
    os.rename(fp.name, fname)
 
 def main():
