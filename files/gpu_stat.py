@@ -97,7 +97,18 @@ def write_shm(jobinfo, fname):
    os.rename(fp.name, fname)
 
 def main():
-   import sys
+   import argparse
+   parser = argparse.ArgumentParser()
+   parser.add_argument('-n', '--nosleep', help="Don't sleep at the beginning",
+                       action="store_true")
+   parser.add_argument('fname', nargs='?', default='/run/gpustats.json',
+                       help='Name of JSON file for reading/storing data')
+   args = parser.parse_args()
+   if not args.nosleep:
+      import time
+      import random
+      time.sleep(random.randint(0, 30))
+
    # initialize stats
    current = {}
    jobs    = jobs_running()
@@ -109,13 +120,8 @@ def main():
    current = job_info(jobs, current)
    current = gpu_info(current)
 
-   if len(sys.argv) > 1:
-      fname = sys.argv[1]
-   else:
-      fname = '/run/gpustats.json'
-
    # combine with previous steps
-   prev = read_shm(fname)
+   prev = read_shm(args.fname)
    for job in jobs:
       if job in prev.keys():
          n = prev[job]['step']
@@ -124,7 +130,7 @@ def main():
          current[job]['step'] = n+1
 
    # write json
-   write_shm(current, fname)
+   write_shm(current, args.fname)
 
 
 if __name__ == '__main__':
