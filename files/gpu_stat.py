@@ -10,7 +10,7 @@ import os
 
 def jobs_running():
    """find slurm-job-ids active on this node"""
-   data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
+   data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%i'])
    return data.split()
 
 
