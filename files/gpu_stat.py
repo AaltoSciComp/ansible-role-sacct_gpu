@@ -10,7 +10,7 @@ import os
 
 def jobs_running():
    """find slurm-job-ids active on this node"""
-   data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%i'])
+   data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
    return data.split()
 
 
@@ -29,13 +29,13 @@ def job_info(jobs,current):
    for job in jobs:
       output = subprocess.check_output(['scontrol', '-o', 'show', 'job', job])
       cpus   = re.search('NumCPUs=(\d+)', output)
-      gres   = re.search('Gres=(\S+)', output).group(1)
+      tres   = re.search('TRES=(\S+)', output).group(1)
       nodes  = re.search('NumNodes=(\d+)', output)
 
       ngpu = 0
-      for g in gres.split(','):
-         gs = g.split(':')
-         if gs[0] == 'gpu':
+      for g in tres.split(','):
+         gs = g.split('=')
+         if gs[0] == 'gres/gpu':
             if len(gs) == 1:
                ngpu = 1
             else:
