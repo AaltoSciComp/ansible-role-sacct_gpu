@@ -13,6 +13,8 @@ sacct-database comment field containing stats for:
 - Job max gpu memory utilization reported by nvidia-smi. For a
   multi-GPU job this is the maximum memory used by any single GPU, not
   the sum.
+- Job gpu power usage (W). Average over time. For a multi-GPU job this 
+  is the sum of power usage for all used GPUs
 
 ## How it works
 
