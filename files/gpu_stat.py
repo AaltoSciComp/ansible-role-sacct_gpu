@@ -9,14 +9,16 @@ import os
 
 
 def jobs_running():
-   """find slurm-job-ids active on this node"""
+   """find slurm-job-ids active on this node
+
+   Returns list of Slurm JobIDs.  JobIDs are strings."""
    data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
    data = data.decode()
    return data.split()
 
 
 def pid2id(pid):
-   """convert pid to slurm jobid"""
+   """Convert a process pid to slurm jobid"""
    with open('/proc/%s/cgroup' % pid) as f:
       for line in f:
          m = re.search('.*slurm\/uid_.*\/job_(\d+)\/.*', line)
@@ -25,8 +27,11 @@ def pid2id(pid):
    return None
 
 
-# get needed slurm values for each running job on the node
 def job_info(jobs,current):
+   """Get needed slurm values for each running job on the node
+
+   For each jobid, update the `current` dictionary with the relevant values.
+   """
    for job in jobs:
       output = subprocess.check_output(['scontrol', '-o', 'show', 'job', job])
       output = output.decode()
@@ -54,6 +59,10 @@ def job_info(jobs,current):
 
 
 def gpu_info(jobinfo):
+   """Scan nvidia-smi output, and update jobinfo dict in-place
+
+   jobinfo is keyed by Slurm job IDs.  This is updated in-place.
+   """
    import xml.etree.cElementTree as ET
 
    output = subprocess.check_output(['nvidia-smi', '-q', '-x'])
@@ -90,6 +99,7 @@ def gpu_info(jobinfo):
    return jobinfo
 
 def read_shm(fil):
+   """Read exitsing jobstats file and return decoded json"""
    import os.path
    jobinfo = {}
 
@@ -101,6 +111,7 @@ def read_shm(fil):
 
 
 def write_shm(jobinfo, fname):
+   """Write (+ encode) new jobstats file (atomic)"""
    with tempfile.NamedTemporaryFile(mode='w', delete=False, \
                      dir=os.path.dirname(os.path.normpath(fname))) as fp:
       json.dump(jobinfo, fp)
