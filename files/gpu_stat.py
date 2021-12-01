@@ -11,6 +11,7 @@ import os
 def jobs_running():
    """find slurm-job-ids active on this node"""
    data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
+   data = data.decode()
    return data.split()
 
 
@@ -28,6 +29,7 @@ def pid2id(pid):
 def job_info(jobs,current):
    for job in jobs:
       output = subprocess.check_output(['scontrol', '-o', 'show', 'job', job])
+      output = output.decode()
       cpus   = re.search('NumCPUs=(\d+)', output)
       tres   = re.search('TRES=(\S+)', output).group(1)
       nodes  = re.search('NumNodes=(\d+)', output)
@@ -55,6 +57,7 @@ def gpu_info(jobinfo):
    import xml.etree.cElementTree as ET
 
    output = subprocess.check_output(['nvidia-smi', '-q', '-x'])
+   output = output.decode()
    root = ET.fromstring(output)
 
    for gpu in root.findall('gpu'):
