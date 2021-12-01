@@ -12,7 +12,8 @@ def jobs_running():
    """find slurm-job-ids active on this node
 
    Returns list of Slurm JobIDs.  JobIDs are strings."""
-   data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
+   #data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
+   data = subprocess.check_output(r"ps aux | grep [s]lurmstepd | sed --regexp-extended 's/.*\[([0-9]+)\..*/\1/' | sort | uniq", shell=True)
    data = data.decode()
    return data.split()
 
