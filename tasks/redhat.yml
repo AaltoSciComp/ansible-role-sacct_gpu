@@ -38,4 +38,5 @@
     path: "{{ sacctgpu_epilog }}"
     content: '{{ sacctgpu_content }}'
     state: present
+    insertafter: 'sacctgpu marker'
 
