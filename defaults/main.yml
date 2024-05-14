@@ -7,3 +7,5 @@ sacctgpu_bin: "/usr/local/bin"
 # Slurm's epilog script where to add call to this function
 sacctgpu_epilog: "/usr/bin/epilog"
 
+# default state for the timer. Override e.g. if building for containers
+sacctgpu_timer_state: restarted

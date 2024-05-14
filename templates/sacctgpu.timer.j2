@@ -1,0 +1,10 @@
+[Unit]
+Description=Collect gpu jobstats for running jobs once a minute
+Requires=sacctgpu.service
+
+[Timer]
+Unit=sacctgpu.service
+OnCalendar= *-*-* *:*:00
+
+[Install]
+WantedBy=multi-user.target

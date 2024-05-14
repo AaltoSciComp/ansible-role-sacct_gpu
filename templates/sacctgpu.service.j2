@@ -1,0 +1,9 @@
+[Unit]
+Description=Generate stats about gpu utilization and memory
+
+[Service]
+Type=oneshot
+ExecStart=python3 {{ sacctgpu_bin }}/gpu_stat.py
+
+[Install]
+WantedBy=multi-user.target

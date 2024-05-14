@@ -13,7 +13,7 @@ def jobs_running():
 
    Returns list of Slurm JobIDs.  JobIDs are strings."""
    #data = subprocess.check_output(['squeue', '-w', os.uname()[1].split('.')[0], '-h', '-o', '%A'])
-   data = subprocess.check_output(r"ps aux | grep [s]lurmstepd | sed --regexp-extended 's/.*\[([0-9]+)\..*/\1/' | sort | uniq", shell=True)
+   data = subprocess.check_output(r"ps aux | grep [s]lurmstepd: | sed --regexp-extended 's/.*\[([0-9]+)\..*/\1/' | sort | uniq", shell=True)
    data = data.decode()
    return data.split()
 
@@ -88,7 +88,7 @@ def gpu_info(jobinfo):
       gutil = float(util.find('gpu_util').text.split()[0])
 
       # power_draw is of the form 35.25 W
-      power = gpu.find('power_readings')
+      power = gpu.find('gpu_power_readings')
       gpwrdraw = float(power.find('power_draw').text.split()[0])
 
       # only update, if jobid not dropped (multinode jobs)
