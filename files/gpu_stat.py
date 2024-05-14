@@ -22,7 +22,7 @@ def pid2id(pid):
    """Convert a process pid to slurm jobid"""
    with open('/proc/%s/cgroup' % pid) as f:
       for line in f:
-         m = re.search('.*slurm\/uid_.*\/job_(\d+)\/.*', line)
+         m = re.search('.*slurm.*\/job_(\d+)\/.*', line)
          if m:
             return m.group(1)
    return None
