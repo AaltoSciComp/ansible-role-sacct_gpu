@@ -16,18 +16,30 @@
     src: sacctgpu.timer.j2
     dest: /lib/systemd/system/sacctgpu.timer
 
+- name: enable sacctgpu.service
+  ansible.builtin.systemd:
+    name: sacctgpu.service
+    enabled: true
+
 - name: restart sacctgpu.service
   ansible.builtin.systemd:
     state: "{{ sacctgpu_timer_state }}"
     daemon_reload: true
     name: sacctgpu.service
-    enabled: true
+  when: sacctgpu_timer_state is defined and sacctgpu_timer_state in ['reloaded', 'restarted', 'started', 'stopped']
 
 - name: restart sacctgpu.timer
   ansible.builtin.systemd:
     state: "{{ sacctgpu_timer_state }}"
     daemon_reload: true
     name: sacctgpu.timer
+  when: sacctgpu_timer_state is defined and sacctgpu_timer_state in ['reloaded', 'restarted', 'started', 'stopped']
+
+- name: enable sacctgpu.timer
+  ansible.builtin.systemd:
+    name: sacctgpu.service
+    enabled: true
+
 
 - name: Set content fact
   set_fact:
@@ -39,4 +51,3 @@
     content: '{{ sacctgpu_content }}'
     state: present
     insertafter: 'sacctgpu marker'
-
